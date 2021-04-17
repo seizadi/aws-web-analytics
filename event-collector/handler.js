@@ -1,3 +1,22 @@
+// 'use strict';
+//
+// module.exports.hello = async (event) => {
+//   return {
+//     statusCode: 200,
+//     body: JSON.stringify(
+//       {
+//         message: 'Go Serverless v1.0! Your function executed successfully!',
+//         input: event,
+//       },
+//       null,
+//       2
+//     ),
+//   };
+//
+//   // Use this code if you don't use the http event with the LAMBDA-PROXY integration
+//   // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+// };
+
 const AWS = require('aws-sdk');
 const { promisify } = require('util');
 
@@ -19,25 +38,27 @@ const response = (body, status) => {
 
 module.exports.collect = async (event, context) => {
   const body = JSON.parse(event.body);
-  if (!body.anonymousId || !body.url || !body.eventType) {
+  if (!body.clientId || !body.url || !body.eventType) {
     return response({
-      error: 'anonymousId, url and eventType required'
+      error: 'clientId, url and eventType required'
     }, 400);
   }
 
   await putRecord({
     Data: JSON.stringify({
-      anonymous_id: body.anonymousId,
+      client_id: body.clientId,
       url: body.url,
       event_type: body.eventType,
+      event_value: body.eventValue,
       referrer: body.referrer,
       timestamp: (new Date()).toISOString(),
       source_ip: event.requestContext.identity.sourceIp,
       user_agent: event.requestContext.identity.userAgent
     }) + '\n',
-    PartitionKey: body.anonymousId,
+    PartitionKey: body.clientId,
     StreamName: 'event-collection'
   });
 
   return response();
 };
+

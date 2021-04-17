@@ -8,3 +8,10 @@ This example project contains a web analytics POC built with Cube.js from the [B
 
 - [Event Collection AWS Lambda function](./event-collection)
 - [Analytics Dashboard React Application](./analytics-dashboard)
+
+# Install
+
+```bash
+cd event-collection
+serverless deploy -v
+```
